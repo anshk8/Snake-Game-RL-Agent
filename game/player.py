@@ -12,11 +12,11 @@ class Snake:
 
 
     #Draw the snake on our screen
-    def draw(self, screen: pygame.Surface, pg: pygame):
+    def draw(self, screen: pygame.Surface):
         GREEN = (0, 200, 0)
         for segment in self.body:
             x, y = segment
-            pg.draw.rect(screen, GREEN, (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(screen, GREEN, (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
     #Movement 
     def move(self):
