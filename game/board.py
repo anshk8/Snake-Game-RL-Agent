@@ -1,4 +1,4 @@
-from utils.constants import WIDTH, HEIGHT, GRID_SIZE, CELL_SIZE
+from utils.constants import WIDTH, HEIGHT, CELL_SIZE
 import pygame as pg
 
 GREY = (40, 40, 40)   # subtle grid lines
