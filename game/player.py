@@ -1,4 +1,4 @@
-from utils.constants import CELL_SIZE
+from utils.constants import CELL_SIZE, GRID_SIZE
 import pygame
 
 class Snake:
@@ -31,3 +31,22 @@ class Snake:
 
         # remove tail
         self.body.pop()                
+    
+    def grow(self):
+    # duplicate the tail — on next move() the snake will be 1 longer
+        self.body.append(self.body[-1])
+
+    def is_dead(self):
+        head_x, head_y = self.body[0]
+
+        # Wall collision
+        if head_x < 0 or head_x >= GRID_SIZE:
+            return True
+        if head_y < 0 or head_y >= GRID_SIZE:
+            return True
+
+        # Self collision — head in rest of body
+        if self.body[0] in self.body[1:]:
+            return True
+
+        return False
