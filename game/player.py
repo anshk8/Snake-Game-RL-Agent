@@ -33,7 +33,7 @@ class Snake:
         self.body.pop()                
     
     def grow(self):
-    # duplicate the tail — on next move() the snake will be 1 longer
+        # duplicate the tail — on next move() the snake will be 1 longer
         self.body.append(self.body[-1])
 
     def is_dead(self):
