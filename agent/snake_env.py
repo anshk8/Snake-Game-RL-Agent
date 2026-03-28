@@ -31,6 +31,10 @@ from game.player import Snake
 from game.food import Food
 from utils.constants import WIDTH, HEIGHT, GRID_SIZE, CELL_SIZE
 
+# Clockwise order — used to compute relative turns
+DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # UP, RIGHT, DOWN, LEFT
+
+
 #gym.Env is the base class for all Gym environments, will let us use env with RL libraries
 class SnakeEnv(gym.Env):
     """
@@ -55,6 +59,7 @@ class SnakeEnv(gym.Env):
 
         # --- Observation space ---
         # 12 binary values, each either 0.0 or 1.0
+        #A box is "a multi-dimensional array where each value has a min and max."
         self.observation_space = spaces.Box(
             low=0, high=1, shape=(12,), dtype=np.float32
         )
@@ -92,11 +97,13 @@ class SnakeEnv(gym.Env):
         food_right = 1.0 if food_x > head_x else 0.0
 
         # --- Current direction (one-hot) ---
+        #In pygame (0, -1) is up, (0, 1) is down, (-1, 0) is left, (1, 0) is right
         dir_up    = 1.0 if dir_y == -1 else 0.0
         dir_down  = 1.0 if dir_y ==  1 else 0.0
         dir_left  = 1.0 if dir_x == -1 else 0.0
         dir_right = 1.0 if dir_x ==  1 else 0.0
 
+        #np array with float32 for Pytorch compatibility
         return np.array([
             danger_up, danger_down, danger_left, danger_right,
             food_up, food_down, food_left, food_right,
@@ -115,3 +122,45 @@ class SnakeEnv(gym.Env):
         # Return initial state and empty info dict
         observation = self.get_state()
         return observation, {}
+
+
+    def step(self, action):
+
+        current_index = DIRECTIONS.index(self.snake.direction)
+
+        #Going straight
+        if action == 0:
+            new_index = current_index
+
+        #Turn right
+        elif action == 1:
+            new_index = (current_index + 1) % 4
+
+        #Turn Left
+        else:
+            new_index = (current_index - 1) % 4
+
+
+        self.snake.direction = DIRECTIONS[new_index]
+        self.snake.move()
+
+        reward = 0.0
+        terminated = False
+
+        #Negative reward if dead and positive if we found and ate food
+        if self.snake.is_dead():
+            reward = -10
+            terminated = True
+        elif self.snake.body[0] == self.food.position:
+            reward = 10.0
+            self.snake.grow()
+            self.food = Food(self.snake.body)
+
+        observation = self.get_state()
+
+        info = {"score": len(self.snake.body) - 3}
+
+        #return observation, reward, terminated, truncated, info
+        return observation, reward, terminated, False, info
+
+        
