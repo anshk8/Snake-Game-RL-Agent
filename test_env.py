@@ -1,25 +1,31 @@
 from agent.snake_env import SnakeEnv
 
-env = SnakeEnv()
-obs, _ = env.reset()
 
-episode = 1
-episode_score = 0
-episode_steps = 0
-scores = []
+def main() -> None:
+    env = SnakeEnv()
+    obs, _ = env.reset()
 
-for i in range(5000):
-    action = env.action_space.sample()
-    obs, reward, terminated, truncated, info = env.step(action)
-    episode_score += reward
-    episode_steps += 1
+    episode = 1
+    episode_score = 0
+    episode_steps = 0
+    scores = []
 
-    if terminated or truncated:
-        scores.append(info['score'])
-        print(f"Episode {episode}: steps={episode_steps} score={info['score']} total_reward={episode_score:.1f}")
-        obs, _ = env.reset()
-        episode += 1
-        episode_score = 0
-        episode_steps = 0
+    for i in range(5000):
+        action = env.action_space.sample()
+        obs, reward, terminated, truncated, info = env.step(action)
+        episode_score += reward
+        episode_steps += 1
 
-print(f"\nAverage score over {len(scores)} episodes: {sum(scores)/len(scores):.2f}")
+        if terminated or truncated:
+            scores.append(info['score'])
+            print(f"Episode {episode}: steps={episode_steps} score={info['score']} total_reward={episode_score:.1f}")
+            obs, _ = env.reset()
+            episode += 1
+            episode_score = 0
+            episode_steps = 0
+
+    print(f"\nAverage score over {len(scores)} episodes: {sum(scores)/len(scores):.2f}")
+
+
+if __name__ == "__main__":
+    main()
