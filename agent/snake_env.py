@@ -22,14 +22,12 @@
 '''
 
 import numpy as np
-from numpy.random import seed
-import pygame
 import gymnasium as gym
 from gymnasium import spaces
 
 from game.player import Snake
 from game.food import Food
-from utils.constants import WIDTH, HEIGHT, GRID_SIZE, CELL_SIZE
+from utils.constants import GRID_SIZE
 
 # Clockwise order — used to compute relative turns
 DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # UP, RIGHT, DOWN, LEFT
