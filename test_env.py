@@ -1,7 +1,7 @@
 from agent.snake_env import SnakeEnv
+from utils.constants import WIDTH, HEIGHT, GRID_SIZE, CELL_SIZE
 
-
-def main() -> None:
+def test1():
     env = SnakeEnv()
     obs, _ = env.reset()
 
@@ -26,6 +26,21 @@ def main() -> None:
 
     print(f"\nAverage score over {len(scores)} episodes: {sum(scores)/len(scores):.2f}")
 
+def testHumanMode():
+    from agent.snake_env import SnakeEnv
+    import time
+
+    env = SnakeEnv(render_mode="human")
+    obs, _ = env.reset()
+
+    for _ in range(200):
+        action = env.action_space.sample()
+        obs, reward, terminated, truncated, info = env.step(action)
+        env.render()
+        if terminated or truncated:
+            obs, _ = env.reset()
+
+    env.close()
 
 if __name__ == "__main__":
-    main()
+    testHumanMode()

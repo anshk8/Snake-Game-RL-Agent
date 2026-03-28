@@ -24,10 +24,10 @@
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
-
+import pygame
 from game.player import Snake
 from game.food import Food
-from utils.constants import GRID_SIZE
+from utils.constants import WIDTH, HEIGHT, GRID_SIZE, CELL_SIZE
 
 # Clockwise order — used to compute relative turns
 DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # UP, RIGHT, DOWN, LEFT
@@ -161,4 +161,54 @@ class SnakeEnv(gym.Env):
         #return observation, reward, terminated, truncated, info
         return observation, reward, terminated, False, info
 
-        
+    def render(self):
+        if self.render_mode == "none":
+            return
+
+        # Initialize pygame on first render call
+        if self.screen is None:
+            pygame.init()
+            self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+            pygame.display.set_caption("Snake - RL Agent")
+            self.clock = pygame.time.Clock()
+            self.font = pygame.font.SysFont("Arial", 24)
+
+        # Handle window close button
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.close()
+
+        # Draw everything
+        self.screen.fill((0, 0, 0))
+
+        # Grid lines
+        GREY = (40, 40, 40)
+        for x in range(0, WIDTH, CELL_SIZE):
+            pygame.draw.line(self.screen, GREY, (x, 0), (x, HEIGHT))
+        for y in range(0, HEIGHT, CELL_SIZE):
+            pygame.draw.line(self.screen, GREY, (0, y), (WIDTH, y))
+
+        # Food
+        fx, fy = self.food.position
+        pygame.draw.rect(self.screen, (200, 0, 0),
+                        (fx * CELL_SIZE, fy * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+        # Snake
+        for i, (x, y) in enumerate(self.snake.body):
+            color = (0, 220, 0) if i == 0 else (0, 160, 0)  # head brighter
+            pygame.draw.rect(self.screen, color,
+                            (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+        # Score
+        score = len(self.snake.body) - 3
+        text = self.font.render(f"Score: {score}", True, (255, 255, 255))
+        self.screen.blit(text, (10, 10))
+
+        pygame.display.update()
+        self.clock.tick(10)  # control render speed
+
+
+    def close(self):
+        if self.screen is not None:
+            pygame.quit()
+            self.screen = None

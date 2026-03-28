@@ -64,4 +64,5 @@ def main():
         pg.display.update()
         clock.tick(60)                    
 
-main()
+if __name__ == "__main__":
+    main()
