@@ -50,3 +50,4 @@ class Snake:
             return True
 
         return False
+    

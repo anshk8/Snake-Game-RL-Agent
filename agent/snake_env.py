@@ -156,7 +156,10 @@ class SnakeEnv(gym.Env):
 
         observation = self.get_state()
 
-        info = {"score": len(self.snake.body) - 3}
+        info = {
+            "score": len(self.snake.body) - 3,
+            "won": len(self.snake.body) == GRID_SIZE * GRID_SIZE  # just a flag, no special reward
+        }
 
         #return observation, reward, terminated, truncated, info
         return observation, reward, terminated, False, info
