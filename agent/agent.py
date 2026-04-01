@@ -58,11 +58,48 @@ class QAgent:
         return int("".join(str(int(x)) for x in state), 2)
 
 
+    def choose_action(self, state):
+        state_idx = self.state_to_index(state)
 
+        if np.random.rand() < self.epsilon:
+            # Explore — pick random action
+            return np.random.randint(self.action_size)
+        else:
+            # Exploit — pick best known action
+            return np.argmax(self.q_table[state_idx])
 
+    def update(self, state, action, reward, next_state, terminated):
+        state_idx      = self.state_to_index(state)
+        next_state_idx = self.state_to_index(next_state)
+
+        # What we currently think this action is worth
+        current_q = self.q_table[state_idx, action]
+
+        # What we should update toward (Bellman target)
+        if terminated:
+            # No future — agent is dead, only immediate reward matters
+            target = reward
+        else:
+            target = reward + self.gamma * np.max(self.q_table[next_state_idx])
+
+        # TD error — gap between estimate and target
+        td_error = target - current_q
+
+        # Nudge Q-value toward target by alpha
+        self.q_table[state_idx, action] += self.alpha * td_error
+
+    def decay_epsilon(self):
+        self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+
+# add to bottom of agent.py
 if __name__ == "__main__":
     agent = QAgent()
-    print("Q-table shape:", agent.q_table.shape)
-    print("All zeros state:", agent.state_to_index([0]*12))
-    print("All ones state:", agent.state_to_index([1]*12))
-    print("Mixed state:", agent.state_to_index([1,0,1,0,0,0,1,1,0,0,0,1]))
+    dummy_state      = np.array([1,0,0,0, 0,1,0,0, 1,0,0,0], dtype=np.float32)
+    dummy_next_state = np.array([0,0,0,0, 0,1,0,0, 0,1,0,0], dtype=np.float32)
+
+    print("Before update:", agent.q_table[agent.state_to_index(dummy_state)])
+    agent.update(dummy_state, action=1, reward=10.0, next_state=dummy_next_state, terminated=False)
+    print("After update: ", agent.q_table[agent.state_to_index(dummy_state)])
+    print("Epsilon:", agent.epsilon)
+    agent.decay_epsilon()
+    print("Epsilon after decay:", agent.epsilon)
