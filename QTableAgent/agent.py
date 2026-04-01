@@ -33,10 +33,17 @@ Gamma (γ) — Discount Factor
         γ = 0.0 → only cares about immediate reward
         γ close to 1.0 → values future rewards almost as much as immediate rewards
 
+        
+
+WHY WE CAN'T WIN / ARE LIMITED:
+    - State space is small enough for a Q-table (4096 states × 3 actions = 12,288 entries).
+    - Max Score was around 30-40 range (see videos folder to watch). The agent does not know where its tail is, our state has 12 items and if we add where tail is, we will have TOO many states which is not feasible for a Q-table. 
+    - So a DQN would be appropriate for a more complex state representation, see DQNAgent folder
+
 '''
 
 
-class QAgent:
+class QTableAgent:
 
     def __init__(self, state_size=12, action_size=3):
         self.state_size = state_size
@@ -93,7 +100,7 @@ class QAgent:
 
 # add to bottom of agent.py
 if __name__ == "__main__":
-    agent = QAgent()
+    agent = QTableAgent()
     dummy_state      = np.array([1,0,0,0, 0,1,0,0, 1,0,0,0], dtype=np.float32)
     dummy_next_state = np.array([0,0,0,0, 0,1,0,0, 0,1,0,0], dtype=np.float32)
 
