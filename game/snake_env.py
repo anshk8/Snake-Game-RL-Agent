@@ -22,6 +22,7 @@
 '''
 
 import numpy as np
+import random
 import gymnasium as gym
 from gymnasium import spaces
 import pygame
@@ -112,14 +113,18 @@ class SnakeEnv(gym.Env):
     #To reset the environment to an initial state 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)  # handles seeding for reproducibility
+        
+        # Seed Python's random module for deterministic food placement
+        if seed is not None:
+            random.seed(seed)
 
         # Fresh game objects every episode
         self.snake = Snake()
         self.food = Food(self.snake.body)
 
-        # Return initial state and empty info dict
+        # Return initial state and info dict with seed
         observation = self.get_state()
-        return observation, {}
+        return observation, {"seed": seed}
 
 
     def step(self, action):
@@ -156,7 +161,10 @@ class SnakeEnv(gym.Env):
 
         observation = self.get_state()
 
-        info = {"score": len(self.snake.body) - 3}
+        info = {
+            "score": len(self.snake.body) - 3,
+            "won": len(self.snake.body) == GRID_SIZE * GRID_SIZE  # just a flag, no special reward
+        }
 
         #return observation, reward, terminated, truncated, info
         return observation, reward, terminated, False, info
