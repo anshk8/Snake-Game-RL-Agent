@@ -1,8 +1,8 @@
-import gymnasium as gym
 import numpy as np
 
 
 '''
+Notes/Learnings and Approach for this agent.
 Notes/Learnings and Approach for this agent.
 - First thing to note is that the space is not continuous but discrete and small enough for a Q-table. 
 
