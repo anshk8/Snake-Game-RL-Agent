@@ -1,5 +1,5 @@
 # snake_end_DQN.py: Is the env for the DQN agent, it is the same as snake_env.py but with a few changes to accomodate the DQN agent.
-
+#Run with: python -m game.snake_env_DQN
 
 import numpy as np
 import random
@@ -66,6 +66,9 @@ class SnakeEnv(gym.Env):
 
         return grid.flatten()
 
+    def _terminal_state(self):
+        return np.zeros((GRID_SIZE * GRID_SIZE,), dtype=np.float32)
+
 
     #To reset the environment to an initial state 
     def reset(self, seed=None, options=None):
@@ -85,45 +88,46 @@ class SnakeEnv(gym.Env):
 
 
     def step(self, action):
+        # ✅ Capture distance BEFORE moving
+        fx, fy = self.food.position
+        hx, hy = self.snake.body[0]
+        dist_before = abs(fx - hx) + abs(fy - hy)
 
+        # --- your existing direction + move logic (unchanged) ---
         current_index = DIRECTIONS.index(self.snake.direction)
-
-        #Going straight
         if action == 0:
             new_index = current_index
-
-        #Turn right
         elif action == 1:
             new_index = (current_index + 1) % 4
-
-        #Turn Left
         else:
             new_index = (current_index - 1) % 4
-
 
         self.snake.direction = DIRECTIONS[new_index]
         self.snake.move()
 
+        # --- reward logic ---
         reward = 0.0
         terminated = False
 
-        #Negative reward if dead and positive if we found and ate food
         if self.snake.is_dead():
-            reward = -10
+            reward = -10.0
             terminated = True
         elif self.snake.body[0] == self.food.position:
             reward = 10.0
             self.snake.grow()
             self.food = Food(self.snake.body)
+        else:
+            # ✅ Shape reward every step — closer = +0.1, farther = -0.1
+            hx2, hy2 = self.snake.body[0]
+            dist_after = abs(fx - hx2) + abs(fy - hy2)
+            reward = 0.1 if dist_after < dist_before else -0.1
 
-        observation = self.get_state()
-
+        # --- rest of step unchanged ---
+        observation = self._terminal_state() if terminated else self.get_state()
         info = {
             "score": len(self.snake.body) - 3,
-            "won": len(self.snake.body) == GRID_SIZE * GRID_SIZE  # just a flag, no special reward
+            "won": len(self.snake.body) == GRID_SIZE * GRID_SIZE
         }
-
-        #return observation, reward, terminated, truncated, info
         return observation, reward, terminated, False, info
 
     def render(self):
