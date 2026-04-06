@@ -18,9 +18,11 @@ DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # UP, RIGHT, DOWN, LEFT
 class SnakeEnv(gym.Env):
     """
     Custom Gymnasium environment for Snake.
-    The agent observes a 12-value binary state vector,
-    chooses 1 of 3 relative actions, and receives rewards
-    for eating food (+10) or dying (-10).
+    The agent observes a flattened GRID_SIZE x GRID_SIZE grid
+    encoded as float values: 0 for empty cells, 1 for snake body,
+    2 for the snake head, and 3 for food. The agent chooses 1 of
+    3 relative actions and receives rewards for eating food (+10)
+    or dying (-10).
     """
 
     #"human" means visual window, "none" means headless (for fast training).
