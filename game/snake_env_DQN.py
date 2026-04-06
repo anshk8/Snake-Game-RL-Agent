@@ -46,6 +46,7 @@ class SnakeEnv(gym.Env):
         # --- Game state (set properly in reset()) ---
         self.snake = None
         self.food = None
+        self.steps_since_food = 0
 
 
 
@@ -81,6 +82,7 @@ class SnakeEnv(gym.Env):
         # Fresh game objects every episode
         self.snake = Snake()
         self.food = Food(self.snake.body)
+        self.steps_since_food = 0
 
         # Return initial state and info dict with seed
         observation = self.get_state()
@@ -88,11 +90,6 @@ class SnakeEnv(gym.Env):
 
 
     def step(self, action):
-        # ✅ Capture distance BEFORE moving
-        fx, fy = self.food.position
-        hx, hy = self.snake.body[0]
-        dist_before = abs(fx - hx) + abs(fy - hy)
-
         # --- your existing direction + move logic (unchanged) ---
         current_index = DIRECTIONS.index(self.snake.direction)
         if action == 0:
@@ -116,11 +113,16 @@ class SnakeEnv(gym.Env):
             reward = 10.0
             self.snake.grow()
             self.food = Food(self.snake.body)
+            self.steps_since_food = 0
         else:
-            # ✅ Shape reward every step — closer = +0.1, farther = -0.1
-            hx2, hy2 = self.snake.body[0]
-            dist_after = abs(fx - hx2) + abs(fy - hy2)
-            reward = 0.1 if dist_after < dist_before else -0.1
+            self.steps_since_food += 1
+            # small time penalty discourages circling
+            reward = -0.01  
+
+            # Kill episode if snake hasn't eaten in too long (prevents infinite loops)
+            if self.steps_since_food > (GRID_SIZE * GRID_SIZE) * 2:
+                reward = -10.0
+                terminated = True
 
         # --- rest of step unchanged ---
         observation = self._terminal_state() if terminated else self.get_state()
