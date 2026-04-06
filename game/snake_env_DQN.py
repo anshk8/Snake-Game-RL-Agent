@@ -1,4 +1,4 @@
-# snake_end_DQN.py: Is the env for the DQN agent, it is the same as snake_env.py but with a few changes to accomodate the DQN agent.
+# snake_env_DQN.py: Is the env for the DQN agent, it is the same as snake_env.py but with a few changes to accommodate the DQN agent.
 #Run with: python -m game.snake_env_DQN
 
 import numpy as np
