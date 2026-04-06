@@ -39,7 +39,7 @@ MAX_STEPS = 2_000     # safety cap per episode (prevent infinite loops)
 PRINT_EVERY = 50      # print stats every N episodes
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_DIR = BASE_DIR / "models"
+MODEL_DIR = BASE_DIR.parent / "models"
 MODEL_PATH = MODEL_DIR / "dqn_agent.pth"
 TOP_GAMES_PATH = MODEL_DIR / "top_3_games.json"
 
