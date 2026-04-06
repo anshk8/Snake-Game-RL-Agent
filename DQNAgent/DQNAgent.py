@@ -87,7 +87,7 @@ class DQNAgent:
 
         #Added this as it was observed that the loss was exploding and the agent was not learning. This is a common technique to stabilize training.
         #During loss.backward(), PyTorch computes how much each weight contributed to the error and assigns it a gradient — a number saying "change this weight by this much." The optimizer then uses those gradients to nudge weights in the right direction.
-       #What clip_grad_norm_ Does
+        #What clip_grad_norm_ Does
         #It's a safety ceiling. Before the optimizer takes its step, it measures the total size of all gradients combined (the "norm") and if it exceeds max_norm=10, it scales all gradients down proportionally so the total equals exactly 10:
         torch.nn.utils.clip_grad_norm_(self.online_net.parameters(), max_norm=10)  # ← add this
         self.optimizer.step()
