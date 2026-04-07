@@ -83,17 +83,13 @@ def train(num_episodes=NUM_EPISODES, max_steps=MAX_STEPS, print_every=PRINT_EVER
             next_obs, reward, terminated, truncated, info = env.step(action)
 
             done = terminated or truncated
-            agent.store(obs, action, reward, next_obs, done)
-            agent.update()   # no-op until buffer >= 64
+            agent.step(obs, action, reward, next_obs, done)
 
             obs = next_obs
             total_reward += reward
 
             if done:
                 break
-
-        # Decay epsilon once per episode (not per step)
-        agent.decay_epsilon()
 
         episode_scores.append(info["score"])
         episode_rewards.append(total_reward)
@@ -116,7 +112,7 @@ def train(num_episodes=NUM_EPISODES, max_steps=MAX_STEPS, print_every=PRINT_EVER
                 f"Avg Score: {avg_score:>5.2f} | "
                 f"Avg Reward: {avg_reward:>7.2f} | "
                 f"Epsilon: {agent.epsilon:.3f} | "
-                f"Buffer: {len(agent.memory):>6}"
+                f"Buffer: {len(agent.buffer):>6}"
             )
 
     env.close()
