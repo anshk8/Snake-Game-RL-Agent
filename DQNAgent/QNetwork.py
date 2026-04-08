@@ -5,13 +5,16 @@ import torch.nn as nn
 
 class QNetwork(nn.Module):
     """
-    CNN with MaxPool — spatially compressed architecture.
+    Three-layer convolutional Q-network.
     
-    Spatial flow:
-    (1, 20, 20) → conv → (32, 20, 20) → pool → (32, 10, 10)
-               → conv → (64, 10, 10)  → pool → (64,  5,  5)
+    For the default input size `(1, 20, 20)`, the spatial flow is:
+    `(1, 20, 20) → conv(1→32, k=3, p=1) → (32, 20, 20)
+                 → conv(32→64, k=3, p=1) → (64, 20, 20)
+                 → conv(64→64, k=3, s=2) → (64,  9,  9)`
     
-    FC input: 64×5×5 = 1,600  (was 25,600 — 16× smaller!)
+    There is no max-pooling layer in this architecture. The flattened input to
+    the fully connected head is computed dynamically from `grid_size`; for a
+    `20×20` grid it is `64×9×9 = 5,184`.
     """
     def __init__(self, grid_size=20, n_actions=3):
         super().__init__()
