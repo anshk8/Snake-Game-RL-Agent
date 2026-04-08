@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+models/
+infiniteLoop1.mp4
+infiniteLoop2.mp4
