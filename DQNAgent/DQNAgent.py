@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+from pathlib import Path
 
 from DQNAgent.QNetwork import QNetwork
 from DQNAgent.ReplayBuffer import ReplayBuffer
@@ -36,7 +37,7 @@ class DQNAgent:
         self.online_net = QNetwork(grid_size, n_actions).to(self.device)
         self.target_net = QNetwork(grid_size, n_actions).to(self.device)
         self.target_net.load_state_dict(self.online_net.state_dict())
-        self.target_net.eval()  # never updated by backprop — only by hard copy
+        self.target_net.eval()  
 
         # ── Optimizer & Loss ──────────────────────────────────────────────────
         self.optimizer = torch.optim.Adam(self.online_net.parameters(), lr=lr)
@@ -158,6 +159,7 @@ class DQNAgent:
     # ──────────────────────────────────────────────────────────────────────────
 
     def save(self, path="checkpoints/dqn_snake.pth"):
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         torch.save({
             "online_net":  self.online_net.state_dict(),
             "target_net":  self.target_net.state_dict(),

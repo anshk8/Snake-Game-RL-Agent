@@ -123,10 +123,18 @@ class SnakeEnv(gym.Env):
             reward = -10.0
             terminated = True
         elif self.snake.body[0] == self.food.position:
-            reward = 10.0
             self.snake.grow()
-            self.food = Food(self.snake.body)
-            self.steps_since_food = 0
+
+            # If the snake now fills the board, end the episode immediately.
+            # Avoid spawning food when there are no free cells left.
+            if len(self.snake.body) == GRID_SIZE * GRID_SIZE:
+                reward = 50.0
+                terminated = True
+                self.steps_since_food = 0
+            else:
+                reward = 10.0
+                self.food = Food(self.snake.body)
+                self.steps_since_food = 0
         else:
             self.steps_since_food += 1
             # small time penalty discourages circling
