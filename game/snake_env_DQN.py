@@ -76,14 +76,23 @@ class SnakeEnv(gym.Env):
     #To reset the environment to an initial state 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)  # handles seeding for reproducibility
-        
-        # Seed Python's random module for deterministic food placement
-        if seed is not None:
-            random.seed(seed)
 
         # Fresh game objects every episode
         self.snake = Snake()
-        self.food = Food(self.snake.body)
+
+        # Preserve the process-wide random state so env resets do not
+        # permanently reseed the global RNG used elsewhere (for example,
+        # replay-buffer sampling). If Food relies on Python's random
+        # module internally, derive a temporary deterministic seed from
+        # Gymnasium's per-env RNG and restore the original global state
+        # immediately after food placement.
+        random_state = random.getstate()
+        try:
+            temp_seed = int(self.np_random.integers(0, 2**32))
+            random.seed(temp_seed)
+            self.food = Food(self.snake.body)
+        finally:
+            random.setstate(random_state)
         self.steps_since_food = 0
 
         # Return initial state and info dict with seed
