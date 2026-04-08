@@ -63,9 +63,11 @@ class SnakeEnv(gym.Env):
         hx, hy = self.snake.body[0]
         grid[hy][hx] = 2.0
 
-        # Mark food
-        fx, fy = self.food.position
-        grid[fy][fx] = 3.0
+        # Mark food when one can be placed. If the board is full,
+        # Food.spawn() may leave position as None.
+        if self.food.position is not None:
+            fx, fy = self.food.position
+            grid[fy][fx] = 3.0
 
         return grid.flatten()
 
