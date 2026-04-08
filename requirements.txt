@@ -2,3 +2,4 @@ numpy
 gymnasium
 pygame
 opencv-python
+torch
