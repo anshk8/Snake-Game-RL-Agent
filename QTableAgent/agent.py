@@ -98,7 +98,7 @@ class QTableAgent:
     def decay_epsilon(self):
         self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
 
-# add to bottom of agent.py
+# A quick test
 if __name__ == "__main__":
     agent = QTableAgent()
     dummy_state      = np.array([1,0,0,0, 0,1,0,0, 1,0,0,0], dtype=np.float32)
